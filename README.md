@@ -1,3 +1,9 @@
+## Integrantes
+
+- Vanesa Alexandra Amaya Bohorquez
+- Laura Yulieth López Albino
+- Maria Camila Lopez Bernal
+
 # Actividad VISE API
 
 Diseñar e implementar una API REST en JSON que procese clientes y compras con diferentes tipos de tarjetas de la empresa ficticia **VISE**.
@@ -30,7 +36,7 @@ Diseñar e implementar una API REST en JSON que procese clientes y compras con d
 6. Probar en el navegador
    - API base: http://127.0.0.1:8000
    - Documentación automática: http://127.0.0.1:8000/docs
-   - Documentación alternativa: http://127.0.0.1:8000/redoc
+
 
 ## 📌 Estructura del proyecto
 actividad-vise/
@@ -39,3 +45,9 @@ actividad-vise/
 ├── requirements.txt   # Dependencias
 ├── README.md          # Documentación
 └── venv/              # Entorno virtual (ignorado en Git)
+
+
+## Instrucciones para correr el docker
+
+docker build -t vise-api .
+docker run -p 8000:8000 vise-api
