@@ -1,16 +1,38 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
+from datetime import datetime
+from app.rules import CardType 
 
-# Participación de [Persona 2]: schemas de Cliente
-
+## ---------- CLIENTES ----------
 class ClientCreate(BaseModel):
     name: str
-    email: EmailStr
-    password: str
-
+    country: str
+    monthlyIncome: float
+    viseClub: bool
+    cardType: CardType  
 class ClientResponse(BaseModel):
-    id: int
+    clientId: int
     name: str
-    email: EmailStr
+    cardType: CardType  
+    status: str
+    message: str
 
     class Config:
-        from_attributes = True
+        orm_mode = True
+
+class ClientErrorResponse(BaseModel):
+    status: str
+    error: str
+
+
+# ---------- COMPRAS ----------
+class PurchaseCreate(BaseModel):
+    clientId: int
+    amount: float
+    currency: str
+    purchaseDate: datetime
+    purchaseCountry: str
+
+class PurchaseResponse(BaseModel):
+    status: str
+    purchase: dict | None = None
+    error: str | None = None
