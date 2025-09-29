@@ -31,7 +31,7 @@ Diseñar e implementar una API REST en JSON que procese clientes y compras con d
    pip install -r requirements.txt
 
 5. Ejecutar el servidor
-   uvicorn app:app --reload
+   uvicorn app.main:app --reload
 
 6. Probar en el navegador
    - API base: http://127.0.0.1:8000
