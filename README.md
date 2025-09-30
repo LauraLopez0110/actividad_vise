@@ -25,7 +25,7 @@ Diseñar e implementar una API REST en JSON que procese clientes y compras con d
    pip install -r requirements.txt
 
 5. Ejecutar el servidor
-   uvicorn app:app --reload
+   uvicorn app.main:app --reload
 
 6. Probar en el navegador
    - API base: http://127.0.0.1:8000
@@ -33,9 +33,29 @@ Diseñar e implementar una API REST en JSON que procese clientes y compras con d
    - Documentación alternativa: http://127.0.0.1:8000/redoc
 
 ## 📌 Estructura del proyecto
-actividad-vise/
-│
-├── app.py             # Código principal de la API
-├── requirements.txt   # Dependencias
-├── README.md          # Documentación
-└── venv/              # Entorno virtual (ignorado en Git)
+
+actividad_vise/
+│── app/
+│ ├── main.py # Punto de entrada FastAPI
+│ ├── config.py # Configuración general
+│ ├── database.py # Conexión a la base de datos
+│ ├── routers/ # Endpoints (clientes, compras, etc.)
+│ ├── models/ # Modelos SQLAlchemy
+│ ├── schemas/ # Esquemas Pydantic
+│ ├── security/ # Seguridad y JWT
+│── requirements.txt # Dependencias
+│── Dockerfile # Imagen Docker
+│── vise_db.db # Base de datos SQLite
+│── session.hurl # Tests automáticos
+│── README.md # Documentación
+
+
+## Edpoints principales
+
+| Método | Endpoint         | Descripción               |
+| ------ | ---------------- | ------------------------- |
+| GET    | `/clientes/`     | Lista todos los clientes  |
+| POST   | `/clientes/`     | Crear un nuevo cliente    |
+| GET    | `/clientes/{id}` | Obtener un cliente por ID |
+| PUT    | `/clientes/{id}` | Actualizar cliente        |
+| DELETE | `/clientes/{id}` | Eliminar cliente          |
