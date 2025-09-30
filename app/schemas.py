@@ -1,38 +1,49 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 from app.rules import CardType 
 
-## ---------- CLIENTES ----------
+# ---------- CLIENTES ----------
 class ClientCreate(BaseModel):
-    name: str
-    country: str
-    monthlyIncome: float
-    viseClub: bool
-    cardType: CardType  
+    name: str = Field(..., example="Alice Classic")
+    country: str = Field(..., example="USA")
+    monthlyIncome: float = Field(..., example=1000.50)
+    viseClub: bool = Field(..., example=False)
+    cardType: CardType = Field(..., example="Classic")  # Enum, pero ejemplo como string
+
 class ClientResponse(BaseModel):
-    clientId: int
-    name: str
-    cardType: CardType  
-    status: str
-    message: str
+    clientId: int = Field(..., example=1)
+    name: str = Field(..., example="Alice Classic")
+    cardType: CardType = Field(..., example="Classic")
+    status: str = Field(..., example="Registered")
+    message: str = Field(..., example="Client registered successfully")
 
     class Config:
         orm_mode = True
 
 class ClientErrorResponse(BaseModel):
-    status: str
-    error: str
+    status: str = Field(..., example="Rejected")
+    error: str = Field(..., example="Monthly income too low for selected card")
 
 
 # ---------- COMPRAS ----------
 class PurchaseCreate(BaseModel):
-    clientId: int
-    amount: float
-    currency: str
-    purchaseDate: datetime
-    purchaseCountry: str
+    clientId: int = Field(..., example=1)
+    amount: float = Field(..., example=250.75)
+    currency: str = Field(..., example="USD")
+    purchaseDate: datetime = Field(..., example="2025-09-29T12:00:00Z")
+    purchaseCountry: str = Field(..., example="Colombia")
 
 class PurchaseResponse(BaseModel):
-    status: str
-    purchase: dict | None = None
-    error: str | None = None
+    status: str = Field(..., example="Success")
+    purchase: dict | None = Field(
+        default=None,
+        example={
+            "id": 101,
+            "clientId": 1,
+            "amount": 250.75,
+            "currency": "USD",
+            "purchaseDate": "2025-09-29T12:00:00Z",
+            "purchaseCountry": "Colombia"
+        }
+    )
+    error: str | None = Field(default=None, example=None)

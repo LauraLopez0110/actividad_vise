@@ -5,9 +5,9 @@ from app.database import get_db
 from app import models, schemas
 from app.rules import validate_client
 
-router = APIRouter(prefix="/client", tags=["Clients"])
+router = APIRouter(tags=["Clients"])
 
-@router.post("", responses={200: {"model": schemas.ClientResponse}, 400: {"model": schemas.ClientErrorResponse}})
+@router.post("/client", responses={200: {"model": schemas.ClientResponse}, 400: {"model": schemas.ClientErrorResponse}})
 def register_client(data: schemas.ClientCreate, db: Session = Depends(get_db)):
     ok, msg = validate_client(data.cardType, data.monthlyIncome, data.viseClub, data.country)
     if not ok:
