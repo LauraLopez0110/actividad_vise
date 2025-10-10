@@ -1,3 +1,8 @@
+# Integrantes:
+
+- Vanesa Alexandra Amaya Bohorquez
+- Laura Yulieth López Albino
+- Maria Camila Lopez Bernal
 # Actividad VISE API
 
 Diseñar e implementar una API REST en JSON que procese clientes y compras con diferentes tipos de tarjetas de la empresa ficticia **VISE**.
