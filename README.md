@@ -55,12 +55,12 @@ actividad_vise/
 │── README.md # Documentación
 
 
-## Edpoints principales
+# OpenTelemetry
 
-| Método | Endpoint         | Descripción               |
-| ------ | ---------------- | ------------------------- |
-| GET    | `/clientes/`     | Lista todos los clientes  |
-| POST   | `/clientes/`     | Crear un nuevo cliente    |
-| GET    | `/clientes/{id}` | Obtener un cliente por ID |
-| PUT    | `/clientes/{id}` | Actualizar cliente        |
-| DELETE | `/clientes/{id}` | Eliminar cliente          |
+1. pip install opentelemetry-distro opentelemetry-exporter-otlp opentelemetry-instrumentation-fastapi opentelemetry-instrumentation-requests
+
+2. opentelemetry-bootstrap -a install
+
+3. uvicorn app.main:app
+
+Aunque ya esta todo en el requirements.txt
