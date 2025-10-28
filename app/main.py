@@ -1,5 +1,5 @@
 # ==============================
-# 📡 VISE API - Observabilidad con Grafana Cloud + OpenTelemetry
+# 📡 VISE API - Observabilidad con Grafana Cloud + Azure Application Insights
 # ==============================
 
 import os
@@ -8,11 +8,10 @@ from fastapi import FastAPI
 from app.database import Base, engine
 from app.routers import client, purchases
 
-# --- 1️⃣ Cargar variables de entorno ---
-load_dotenv()  # Debe ejecutarse antes de configurar OpenTelemetry
+# Cargar variables de entorno
+load_dotenv()
 
-
-# --- 2️⃣ Configurar OpenTelemetry ---
+# --- Configurar OpenTelemetry para Grafana Cloud ---
 from opentelemetry import trace, metrics, _logs
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
@@ -31,16 +30,14 @@ from opentelemetry.instrumentation.starlette import StarletteInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.instrumentation.logging import LoggingInstrumentor
 
+# Integración con Azure Application Insights
+from app.telemetry import setup_azure_monitor
+
 
 def setup_otel(service_name: str = "vise-api"):
-    """Configura exportadores OTLP para traces, métricas y logs hacia Grafana Cloud."""
+    """Configura exportadores OTLP para Grafana Cloud y Azure Insights."""
     endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "").rstrip("/")
     headers = os.getenv("OTEL_EXPORTER_OTLP_HEADERS", "")
-    protocol = os.getenv("OTEL_EXPORTER_OTLP_PROTOCOL", "http/protobuf")
-
-    if not endpoint or not headers:
-        print("⚠️  [OpenTelemetry] Variables de entorno incompletas. No se exportarán métricas a Grafana Cloud.")
-        return
 
     resource = Resource.create({
         "service.name": service_name,
@@ -50,66 +47,62 @@ def setup_otel(service_name: str = "vise-api"):
 
     # --- Traces ---
     tracer_provider = TracerProvider(resource=resource)
-    tracer_provider.add_span_processor(
-        BatchSpanProcessor(
-            OTLPSpanExporter(
-                endpoint=f"{endpoint}/v1/traces",
-                headers={"Authorization": headers},
+    if endpoint and headers:
+        tracer_provider.add_span_processor(
+            BatchSpanProcessor(
+                OTLPSpanExporter(
+                    endpoint=f"{endpoint}/v1/traces",
+                    headers={"Authorization": headers},
+                )
             )
         )
-    )
     trace.set_tracer_provider(tracer_provider)
 
     # --- Metrics ---
-    metric_reader = PeriodicExportingMetricReader(
-        OTLPMetricExporter(
-            endpoint=f"{endpoint}/v1/metrics",
-            headers={"Authorization": headers},
-        )
-    )
-    meter_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
-    metrics.set_meter_provider(meter_provider)
-
-    # --- Logs ---
-    logger_provider = LoggerProvider(resource=resource)
-    logger_provider.add_log_record_processor(
-        BatchLogRecordProcessor(
-            OTLPLogExporter(
-                endpoint=f"{endpoint}/v1/logs",
+    if endpoint and headers:
+        metric_reader = PeriodicExportingMetricReader(
+            OTLPMetricExporter(
+                endpoint=f"{endpoint}/v1/metrics",
                 headers={"Authorization": headers},
             )
         )
-    )
+        meter_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
+        metrics.set_meter_provider(meter_provider)
+
+    # --- Logs ---
+    logger_provider = LoggerProvider(resource=resource)
+    if endpoint and headers:
+        logger_provider.add_log_record_processor(
+            BatchLogRecordProcessor(
+                OTLPLogExporter(
+                    endpoint=f"{endpoint}/v1/logs",
+                    headers={"Authorization": headers},
+                )
+            )
+        )
     _logs.set_logger_provider(logger_provider)
 
-    # --- Instrumentaciones comunes ---
     LoggingInstrumentor().instrument(set_logging_format=True)
     RequestsInstrumentor().instrument()
 
-    print("✅ OpenTelemetry configurado correctamente para Grafana Cloud.")
+    print("✅ OpenTelemetry configurado para Grafana Cloud.")
 
 
-# --- 3️⃣ Inicializar OpenTelemetry ---
+# --- Inicializar ambos sistemas de observabilidad ---
 setup_otel()
+setup_azure_monitor()
 
-
-# --- 4️⃣ Inicializar aplicación FastAPI ---
+# --- Inicializar aplicación FastAPI ---
 app = FastAPI(title="VISE API - Clientes y Compras")
 
-# Crear las tablas del ORM
 Base.metadata.create_all(bind=engine)
-
-# Instrumentar la app FastAPI + Starlette para trazas automáticas
 FastAPIInstrumentor().instrument_app(app)
 StarletteInstrumentor().instrument_app(app)
 
-# Registrar los routers
+# Registrar routers
 app.include_router(client.router)
 app.include_router(purchases.router)
 
-
-# --- 5️⃣ Endpoint raíz ---
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the VISE API"}
-
+    return {"message": "Welcome to the VISE API (Grafana + Azure Monitor) 🚀"}
