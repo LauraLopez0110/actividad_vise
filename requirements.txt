@@ -1,13 +1,25 @@
+# --- Core FastAPI ---
 fastapi
 uvicorn[standard]
 pydantic
 pydantic-settings
 email-validator
+
+# --- Base de datos y autenticación ---
 sqlalchemy
 databases
 psycopg2-binary
 python-jose
 passlib[bcrypt]
 python-dotenv
+
+# --- Testing ---
 pytest
 httpx
+
+# --- OpenTelemetry + Axiom ---
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-instrumentation-fastapi
+opentelemetry-instrumentation-asgi
+opentelemetry-exporter-otlp
